@@ -13,6 +13,23 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Diagnostics / Health Check
+app.get('/api/health', async (req, res) => {
+  try {
+    await db.execute('SELECT 1');
+    res.json({
+      status: 'ok',
+      database: 'connected',
+      env: {
+        node: process.version,
+        vercel: !!process.env.VERCEL
+      }
+    });
+  } catch (err: any) {
+    res.status(500).json({ status: 'error', database: 'disconnected', error: err.message });
+  }
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
@@ -29,10 +46,11 @@ if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
 }
 
 const startServer = async () => {
-  await initDb();
-
-  // Seed Admin
   try {
+    console.log('Initializing database...');
+    await initDb();
+
+    // Seed Admin
     const result = await db.execute({
       sql: 'SELECT * FROM users WHERE username = ?',
       args: ['admin']
@@ -44,10 +62,12 @@ const startServer = async () => {
         sql: 'INSERT INTO users (username, password) VALUES (?, ?)',
         args: ['admin', hashedPassword]
       });
-      console.log('Admin user created: admin / admin123');
+      console.log('Admin user created successfully');
     }
   } catch (err) {
-    console.error('Failed to seed admin:', err);
+    console.error('Critical Startup Error:', err);
+    // Don't swallow error in local dev
+    if (process.env.NODE_ENV !== 'production') throw err;
   }
 
   if (process.env.NODE_ENV !== 'production') {
@@ -64,7 +84,8 @@ const startServer = async () => {
   }
 };
 
-startServer();
+// Start initialization but don't block the exports for serverless
+startServer().catch(err => console.error('Initialization failed:', err));
 
 export const handler = serverless(app);
 export default app;

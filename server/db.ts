@@ -14,6 +14,10 @@ const pool = new Pool({
   }
 });
 
+pool.on('error', (err) => {
+  console.error('Unexpected error on idle client', err);
+});
+
 // Helper for consistency in queries
 const db = {
   execute: async (options: { sql: string; args?: any[] } | string) => {
@@ -24,11 +28,16 @@ const db = {
     let count = 1;
     const pgSql = sql.replace(/\?/g, () => `$${count++}`);
 
-    const result = await pool.query(pgSql, args);
-    return {
-      rows: result.rows,
-      lastInsertRowid: (result.rows[0] as any)?.id // PostgreSQL doesn't have lastInsertRowid like SQLite
-    };
+    try {
+      const result = await pool.query(pgSql, args);
+      return {
+        rows: result.rows,
+        lastInsertRowid: (result.rows[0] as any)?.id // PostgreSQL doesn't have lastInsertRowid like SQLite
+      };
+    } catch (err: any) {
+      console.error(`Database Query Error: ${err.message}`, { sql, args });
+      throw err;
+    }
   }
 };
 
