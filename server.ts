@@ -18,8 +18,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// Static serving for production
-if (process.env.NODE_ENV === 'production') {
+// Static serving for local production testing
+if (process.env.NODE_ENV === 'production' && !process.env.VERCEL) {
   app.use(express.static(path.join(process.cwd(), 'dist')));
   app.get('*', (req, res) => {
     if (!req.path.startsWith('/api')) {
