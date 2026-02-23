@@ -2,11 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
-import serverless from 'serverless-http';
-import authRoutes from './server/routes/authRoutes.ts';
-import postRoutes from './server/routes/postRoutes.ts';
-import uploadRoutes from './server/routes/uploadRoutes.ts';
-import db, { initDb } from './server/db.ts';
+import authRoutes from './server/routes/authRoutes';
+import postRoutes from './server/routes/postRoutes';
+import uploadRoutes from './server/routes/uploadRoutes';
+import db, { initDb } from './server/db';
 import bcrypt from 'bcryptjs';
 
 const app = express();
@@ -84,8 +83,6 @@ const startServer = async () => {
   }
 };
 
-// Start initialization but don't block the exports for serverless
 startServer().catch(err => console.error('Initialization failed:', err));
 
-export const handler = serverless(app);
 export default app;
