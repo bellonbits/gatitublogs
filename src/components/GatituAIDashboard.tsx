@@ -8,6 +8,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Graph, InteractableNote } from './generative-ui';
 import RecipeCard from './RecipeCard';
 
@@ -269,8 +271,38 @@ const GatituAIDashboard: React.FC = () => {
                                             "max-w-[80%] rounded-3xl p-5 zyricon-glass border border-white/5",
                                             message.role === 'user' ? "bg-purple-600/30 text-white shadow-[0_0_20px_rgba(147,51,234,0.15)]" : ""
                                         )}>
-                                            <div className="text-sm font-light leading-relaxed whitespace-normal prose prose-invert prose-p:leading-relaxed prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10 prose-headings:font-bold prose-headings:text-white prose-a:text-purple-400">
-                                                <ReactMarkdown>
+                                            <div className="text-sm font-light leading-relaxed whitespace-normal prose prose-invert prose-p:leading-relaxed prose-pre:bg-transparent prose-pre:p-0 prose-pre:m-0 prose-headings:font-bold prose-headings:text-white prose-a:text-purple-400">
+                                                <ReactMarkdown
+                                                    components={{
+                                                        code({ node, inline, className, children, ...props }: any) {
+                                                            const match = /language-(\w+)/.exec(className || '')
+                                                            return !inline && match ? (
+                                                                <div className="rounded-xl overflow-hidden mt-6 mb-6 border border-white/10 shadow-2xl bg-[#09080b]">
+                                                                    <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10 zyricon-glass">
+                                                                        <span className="text-xs font-mono text-gray-400 capitalize">{match[1]}</span>
+                                                                        <div className="flex space-x-2">
+                                                                            <div className="w-2.5 h-2.5 rounded-full bg-red-500/80 hover:bg-red-400 transition-colors cursor-pointer"></div>
+                                                                            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 hover:bg-yellow-400 transition-colors cursor-pointer"></div>
+                                                                            <div className="w-2.5 h-2.5 rounded-full bg-green-500/80 hover:bg-green-400 transition-colors cursor-pointer"></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <SyntaxHighlighter
+                                                                        {...props}
+                                                                        PreTag="div"
+                                                                        children={String(children).replace(/\n$/, '')}
+                                                                        language={match[1]}
+                                                                        style={vscDarkPlus}
+                                                                        customStyle={{ margin: 0, padding: '1.5rem', background: 'transparent', fontSize: '0.875rem' }}
+                                                                    />
+                                                                </div>
+                                                            ) : (
+                                                                <code {...props} className="bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded-md font-mono text-[13px] border border-purple-500/20">
+                                                                    {children}
+                                                                </code>
+                                                            )
+                                                        }
+                                                    }}
+                                                >
                                                     {message.content.replace(/```json \[(RECIPE_CARD|GRAPH)\][\s\S]*?```/g, '').trim()}
                                                 </ReactMarkdown>
                                             </div>
