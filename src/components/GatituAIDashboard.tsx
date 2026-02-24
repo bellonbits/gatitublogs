@@ -39,8 +39,9 @@ const GatituAIDashboard: React.FC = () => {
         try {
             console.log('[GatituAI] Submitting message:', value);
             await submit();
-        } catch (err) {
+        } catch (err: any) {
             console.error('[GatituAI] Submit error:', err);
+            alert(`AI Error: ${err.message || 'Check your API key in .env'}`);
         }
     };
 
