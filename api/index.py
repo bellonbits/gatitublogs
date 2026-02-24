@@ -88,7 +88,7 @@ async def login(request: Request, session: Session = Depends(get_session)):
         logger.error(f"Login error: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@app.post("/api/auth/reset-admin")
+@app.get("/api/auth/reset-admin")
 async def reset_admin(session: Session = Depends(get_session)):
     try:
         # Force reset admin password to admin123
