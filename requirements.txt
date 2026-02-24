@@ -1,3 +1,10 @@
 fastapi
 uvicorn
-pydantic
+sqlmodel
+asyncpg
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+cloudinary
+python-dotenv
+psycopg2-binary

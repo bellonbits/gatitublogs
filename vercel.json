@@ -2,10 +2,6 @@
     "version": 2,
     "builds": [
         {
-            "src": "server.ts",
-            "use": "@vercel/node"
-        },
-        {
             "src": "api/index.py",
             "use": "@vercel/python"
         },
@@ -19,12 +15,8 @@
     ],
     "rewrites": [
         {
-            "source": "/api/py/:path*",
-            "destination": "/api/index.py"
-        },
-        {
             "source": "/api/:path*",
-            "destination": "/server.ts"
+            "destination": "/api/index.py"
         },
         {
             "source": "/((?!api|assets|favicon.ico|architect.jpeg).*)",
