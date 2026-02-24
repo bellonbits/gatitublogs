@@ -271,9 +271,19 @@ const GatituAIDashboard: React.FC = () => {
                                             "max-w-[80%] rounded-3xl p-5 zyricon-glass border border-white/5",
                                             message.role === 'user' ? "bg-purple-600/30 text-white shadow-[0_0_20px_rgba(147,51,234,0.15)]" : ""
                                         )}>
-                                            <div className="text-sm font-light leading-relaxed whitespace-normal prose prose-invert prose-p:leading-relaxed prose-pre:bg-transparent prose-pre:p-0 prose-pre:m-0 prose-headings:font-bold prose-headings:text-white prose-a:text-purple-400">
+                                            <div className="text-sm font-light leading-relaxed whitespace-normal text-gray-300">
                                                 <ReactMarkdown
                                                     components={{
+                                                        h1: ({ node, ...props }) => <h1 className="text-2xl font-bold text-white mt-8 mb-4 tracking-tight" {...props} />,
+                                                        h2: ({ node, ...props }) => <h2 className="text-xl font-bold text-white mt-6 mb-3 tracking-tight" {...props} />,
+                                                        h3: ({ node, ...props }) => <h3 className="text-lg font-semibold text-white mt-5 mb-2" {...props} />,
+                                                        p: ({ node, ...props }) => <p className="mb-4 last:mb-0 leading-relaxed" {...props} />,
+                                                        ul: ({ node, ...props }) => <ul className="list-disc mb-4 pl-5 space-y-2 marker:text-purple-500" {...props} />,
+                                                        ol: ({ node, ...props }) => <ol className="list-decimal mb-4 pl-5 space-y-2 marker:text-purple-500 font-mono marker:text-sm" {...props} />,
+                                                        li: ({ node, ...props }) => <li className="pl-1 leading-relaxed" {...props} />,
+                                                        strong: ({ node, ...props }) => <strong className="font-semibold text-purple-100 bg-white/5 px-1 rounded" {...props} />,
+                                                        a: ({ node, ...props }) => <a className="text-purple-400 hover:text-purple-300 underline underline-offset-4 decoration-purple-500/30 hover:decoration-purple-400 transition-all font-medium" {...props} />,
+                                                        blockquote: ({ node, ...props }) => <blockquote className="border-l-2 border-purple-500 pl-4 py-2 my-5 bg-purple-500/5 text-gray-400 rounded-r-xl italic" {...props} />,
                                                         code({ node, inline, className, children, ...props }: any) {
                                                             const match = /language-(\w+)/.exec(className || '')
                                                             return !inline && match ? (
