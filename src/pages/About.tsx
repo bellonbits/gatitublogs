@@ -38,7 +38,7 @@ const About = () => {
             className="relative rounded-3xl overflow-hidden border border-white/10 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] bg-dark-card"
           >
             <img
-              src="/architect.png"
+              src="/architect.jpeg"
               alt="Architect Photo"
               className="w-full h-[600px] object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 ease-in-out scale-110 group-hover:scale-100"
             />
