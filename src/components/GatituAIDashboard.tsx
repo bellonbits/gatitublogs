@@ -6,18 +6,40 @@ import {
     Sparkles, BrainCircuit, ClipboardList, Menu, X
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useTambo, useTamboThreadInput } from '@tambo-ai/react';
+import { useTambo, useTamboThreadInput, useTamboConfig } from '@tambo-ai/react';
 import clsx from 'clsx';
+import { useEffect } from 'react';
 
 const GatituAIDashboard: React.FC = () => {
     const { messages } = useTambo();
     const { value, setValue, submit, isPending } = useTamboThreadInput();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('Chat');
+    const config = useTamboConfig();
 
-    const handleAction = (prompt: string) => {
-        setValue(prompt);
-        setTimeout(() => submit(), 100);
+    useEffect(() => {
+        console.log('[GatituAI] Messages:', messages);
+        console.log('[GatituAI] Config:', config);
+    }, [messages, config]);
+
+    const handleAction = async (prompt: string) => {
+        try {
+            setValue(prompt);
+            // Wait for state to update
+            setTimeout(async () => {
+                console.log('[GatituAI] Submitting via action:', prompt);
+                await submit();
+            }, 100);
+        } catch (err) {
+            console.error('[GatituAI] Action submit error:', err);
+        }
+    };
+
+    const handleSubmit = async () => {
+        try {
+            console.log('[GatituAI] Submitting message:', value);
+            await submit();
+        } catch (err) {
+            console.error('[GatituAI] Submit error:', err);
+        }
     };
 
     const handleNewChat = () => {
@@ -255,7 +277,7 @@ const GatituAIDashboard: React.FC = () => {
                                         <Mic className="w-4 h-4" />
                                     </button>
                                     <button
-                                        onClick={() => submit()}
+                                        onClick={handleSubmit}
                                         disabled={!value || isPending}
                                         className="p-2 bg-purple-500 text-white rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:bg-purple-500/80 disabled:opacity-50 transition-all"
                                     >

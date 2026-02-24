@@ -12,13 +12,11 @@ const TAMBO_CONFIG = {
 };
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <TamboProvider
-      apiKey={TAMBO_CONFIG.apiKey}
-      userKey={TAMBO_CONFIG.userKey}
-      components={TAMBO_CONFIG.components}
-    >
-      <App />
-    </TamboProvider>
-  </StrictMode>,
+  <TamboProvider
+    apiKey={TAMBO_CONFIG.apiKey}
+    userKey={TAMBO_CONFIG.userKey}
+    components={TAMBO_CONFIG.components}
+  >
+    <App />
+  </TamboProvider>,
 );
