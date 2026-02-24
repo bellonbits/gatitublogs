@@ -262,6 +262,24 @@ const GatituAIDashboard: React.FC = () => {
                                         </button>
                                     ))}
                                 </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mt-12 px-4 pb-12">
+                                    {featureCards.map((card) => (
+                                        <button
+                                            key={card.title}
+                                            onClick={() => handleSubmit(card.prompt)}
+                                            className="zyricon-glass p-6 rounded-2xl border border-white/5 hover:border-purple-500/30 transition-all group text-left"
+                                        >
+                                            <div className="flex justify-between items-start mb-6">
+                                                <div className="p-3 bg-white/5 rounded-xl group-hover:text-purple-500 transition-colors">
+                                                    <card.icon className="w-6 h-6" />
+                                                </div>
+                                            </div>
+                                            <h3 className="text-white font-bold mb-2">{card.title}</h3>
+                                            <p className="text-sm text-gray-500 leading-relaxed font-medium">{card.desc}</p>
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         ) : (
                             <div className="w-full space-y-8 py-8">
@@ -342,64 +360,41 @@ const GatituAIDashboard: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="w-full flex flex-col items-center px-4 pb-8">
+                <div className="w-full flex justify-center px-4 pb-4 pt-4 bg-gradient-to-t from-[#09080b] via-[#09080b]/80 to-transparent relative z-10 -mt-10">
                     <div className="w-full max-w-3xl">
-                        <div className="zyricon-glass border border-white/10 rounded-2xl p-4 shadow-2xl">
-                            <div className="flex items-start space-x-3 mb-4">
-                                <Sparkles className="w-5 h-5 text-purple-500 mt-1" />
-                                <textarea
-                                    value={value}
-                                    onChange={(e) => setValue(e.target.value)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' && !e.shiftKey) {
-                                            e.preventDefault();
-                                            handleSubmit();
-                                        }
-                                    }}
-                                    placeholder="Ask Anything..."
-                                    className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500 resize-none h-20 text-lg scrollbar-hide"
-                                />
-                            </div>
-
-                            <div className="flex items-center justify-between border-t border-white/5 pt-4">
-                                <div className="flex items-center space-x-4">
-                                    <button className="p-2 text-gray-500 hover:text-white transition-colors rounded-xl bg-white/5">
-                                        <Paperclip className="w-4 h-4" />
-                                    </button>
-                                </div>
-
-                                <div className="flex items-center space-x-2">
-                                    <button
-                                        onClick={() => handleSubmit()}
-                                        disabled={!value || isPending}
-                                        className="p-2 bg-purple-500 text-white rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:bg-purple-500/80 disabled:opacity-50 transition-all"
-                                    >
-                                        <ArrowUp className="w-4 h-4" />
-                                    </button>
-                                </div>
+                        <div className="zyricon-glass border border-white/10 rounded-3xl p-2 pl-4 shadow-2xl flex items-end space-x-2 relative transition-all focus-within:border-purple-500/40 focus-within:shadow-[0_0_30px_rgba(168,85,247,0.1)]">
+                            <Sparkles className="w-5 h-5 text-purple-500 mb-3.5 hidden sm:block" />
+                            <textarea
+                                value={value}
+                                onChange={(e) => {
+                                    setValue(e.target.value);
+                                    e.target.style.height = 'auto';
+                                    e.target.style.height = Math.min(e.target.scrollHeight, 150) + 'px';
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleSubmit();
+                                    }
+                                }}
+                                placeholder="Ask Anything..."
+                                className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500 resize-none min-h-[48px] max-h-[150px] text-base py-3 scrollbar-hide"
+                                rows={1}
+                            />
+                            <div className="flex items-center space-x-2 mb-1 pr-1">
+                                <button className="p-2 text-gray-500 hover:text-white transition-colors rounded-xl hover:bg-white/5 hidden sm:block">
+                                    <Paperclip className="w-5 h-5" />
+                                </button>
+                                <button
+                                    onClick={() => handleSubmit()}
+                                    disabled={!value || isPending}
+                                    className="p-2.5 bg-purple-500 text-white rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:bg-purple-500/80 disabled:opacity-50 transition-all"
+                                >
+                                    <ArrowUp className="w-5 h-5" />
+                                </button>
                             </div>
                         </div>
                     </div>
-
-                    {messages.length === 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mt-12">
-                            {featureCards.map((card) => (
-                                <button
-                                    key={card.title}
-                                    onClick={() => handleSubmit(card.prompt)}
-                                    className="zyricon-glass p-6 rounded-2xl border border-white/5 hover:border-purple-500/30 transition-all group text-left"
-                                >
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className="p-3 bg-white/5 rounded-xl group-hover:text-purple-500 transition-colors">
-                                            <card.icon className="w-6 h-6" />
-                                        </div>
-                                    </div>
-                                    <h3 className="text-white font-bold mb-2">{card.title}</h3>
-                                    <p className="text-sm text-gray-500 leading-relaxed font-medium">{card.desc}</p>
-                                </button>
-                            ))}
-                        </div>
-                    )}
                 </div>
             </main>
         </div>
