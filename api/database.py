@@ -14,12 +14,14 @@ if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
 engine = create_engine(DATABASE_URL)
 
 class User(SQLModel, table=True):
+    __tablename__ = "users"
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(unique=True, index=True)
     password: str
     role: str = Field(default="admin")
 
 class Post(SQLModel, table=True):
+    __tablename__ = "posts"
     id: Optional[int] = Field(default=None, primary_key=True)
     title: str
     slug: str = Field(unique=True, index=True)
@@ -34,6 +36,7 @@ class Post(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 class Category(SQLModel, table=True):
+    __tablename__ = "categories"
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(unique=True)
     slug: str = Field(unique=True)
