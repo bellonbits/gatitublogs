@@ -4,7 +4,9 @@ sqlmodel
 asyncpg
 python-jose[cryptography]
 passlib[bcrypt]
+bcrypt
 python-multipart
 cloudinary
 python-dotenv
 psycopg2-binary
+python-slugify
