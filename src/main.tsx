@@ -6,7 +6,7 @@ import App from './App.tsx';
 import './index.css';
 
 const TAMBO_CONFIG = {
-  apiKey: import.meta.env.VITE_TAMBO_API_KEY || "apikey",
+  apiKey: import.meta.env.VITE_TAMBO_API_KEY || "tambo_rGgcn8LdF8XdDwxOJ5OeESdqqk6hoOWiwfEIMlGOjJZ5Cm3/5dvaKbvg3rFtorE+y/XFsmMr3mMbQPZCZpeXxQSMQVw7VvDouKu9K+Ppomc=",
   userKey: "gatitu-user",
   components: tamboComponents,
 };
