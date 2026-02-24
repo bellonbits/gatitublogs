@@ -24,7 +24,7 @@ class Post(SQLModel, table=True):
     __tablename__ = "posts"
     id: Optional[int] = Field(default=None, primary_key=True)
     title: str
-    slug: str = Field(unique=True, index=True)
+    slug: Optional[str] = Field(default=None, unique=True, index=True)
     content: str
     excerpt: Optional[str] = None
     cover_image: Optional[str] = None
