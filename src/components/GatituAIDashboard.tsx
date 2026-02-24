@@ -130,7 +130,7 @@ const GatituAIDashboard: React.FC = () => {
                 {/* Header */}
                 <header className="flex justify-between items-center px-4 mb-8">
                     <div className="flex items-center space-x-2 bg-white/5 px-4 py-2 rounded-xl border border-white/5 hover:bg-white/10 cursor-pointer transition-all">
-                        <span className="text-sm font-medium">Llama Maverick 17B</span>
+                        <span className="text-sm font-medium">Llama 3 (Groq)</span>
                         <ArrowUp className="w-4 h-4 rotate-180 text-gray-500" />
                     </div>
 
@@ -166,7 +166,7 @@ const GatituAIDashboard: React.FC = () => {
                                         </div>
                                     </div>
                                     <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 text-glow tracking-tighter font-mono">GATITU<span className="text-purple-500">.AI</span></h1>
-                                    <p className="text-cyber-gray max-w-lg mx-auto font-mono text-xs uppercase tracking-[0.3em]">Quantum Intelligence Interface // v4.0.2</p>
+                                    <p className="text-cyber-gray max-w-lg mx-auto font-mono text-xs uppercase tracking-[0.3em]">Groq-Powered Intelligence // v4.0.2</p>
                                 </motion.div>
 
                                 {/* Action Chips */}

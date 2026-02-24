@@ -10,6 +10,7 @@ import GatituAIDashboard from './components/GatituAIDashboard.tsx';
 import AdminLogin from './pages/AdminLogin.tsx';
 import AdminDashboard from './pages/AdminDashboard.tsx';
 import AdminEditor from './pages/AdminEditor.tsx';
+import AdminSettings from './pages/AdminSettings.tsx';
 import { AuthProvider, useAuth } from './context/AuthContext.tsx';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -47,6 +48,7 @@ export default function App() {
             <Route path="posts" element={<AdminDashboard />} />
             <Route path="posts/new" element={<AdminEditor />} />
             <Route path="posts/:id" element={<AdminEditor />} />
+            <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>
       </AuthProvider>

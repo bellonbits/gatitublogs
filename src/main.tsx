@@ -7,7 +7,7 @@ import './index.css';
 
 const TAMBO_CONFIG = {
   apiKey: "apikey", // User reset this to placeholder
-  model: "groq/meta-llama/llama-4-maverick-17b-128e-instruct",
+  userKey: "gatitu-user",
   components: tamboComponents,
 };
 
@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <TamboProvider
       apiKey={TAMBO_CONFIG.apiKey}
-      model={TAMBO_CONFIG.model}
+      userKey={TAMBO_CONFIG.userKey}
       components={TAMBO_CONFIG.components}
     >
       <App />
