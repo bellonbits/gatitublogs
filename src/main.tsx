@@ -7,7 +7,7 @@ import './index.css';
 
 const TAMBO_CONFIG = {
   apiKey: "apikey", // User reset this to placeholder
-  userKey: "gatitu-user",
+  model: "groq/meta-llama/llama-4-maverick-17b-128e-instruct",
   components: tamboComponents,
 };
 
