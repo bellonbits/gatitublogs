@@ -3,14 +3,29 @@ import {
     Plus, MessageSquare, Archive, Library, LayoutGrid,
     Image as ImageIcon, Presentation, Code,
     Settings, Share2, Mic, ArrowUp, Paperclip,
-    Sparkles, BrainCircuit, ClipboardList
+    Sparkles, BrainCircuit, ClipboardList, Menu, X
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTambo, useTamboThreadInput } from '@tambo-ai/react';
+import clsx from 'clsx';
 
 const GatituAIDashboard: React.FC = () => {
     const { messages } = useTambo();
     const { value, setValue, submit, isPending } = useTamboThreadInput();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('Chat');
+
+    const handleAction = (prompt: string) => {
+        setValue(prompt);
+        setTimeout(() => submit(), 100);
+    };
+
+    const handleNewChat = () => {
+        // Usually Tambo threads are managed via URL or context
+        // For now we'll just clear the input and notify user functionality is ready
+        setValue('');
+        window.location.reload(); // Simple way to start fresh if state is volatile
+    };
     const [activeWorkspace, setActiveWorkspace] = useState('New Project');
 
     const actionChips = [
@@ -41,34 +56,61 @@ const GatituAIDashboard: React.FC = () => {
     ];
 
     return (
-        <div className="flex h-[calc(100vh-80px)] w-full bg-[#09080b] text-[#d1d5db] overflow-hidden font-sans">
-            {/* Sidebar - Hidden on mobile, wide on desktop */}
-            <aside className="hidden lg:flex w-72 zyricon-glass border-r border-white/5 flex-col p-6 z-20">
-                <div className="flex items-center space-x-3 mb-10 opacity-50 grayscale hover:grayscale-0 transition-all">
-                    <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
-                        <Sparkles className="w-4 h-4 text-purple-400" />
+        <div className="flex h-[calc(100vh-80px)] w-full bg-[#09080b] text-[#d1d5db] overflow-hidden font-sans relative">
+            {/* Mobile Sidebar Toggle */}
+            <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="lg:hidden absolute top-4 left-4 z-50 p-2 bg-white/5 border border-white/10 rounded-lg text-gray-400 hover:text-white transition-all shadow-xl"
+            >
+                <Menu className="w-5 h-5" />
+            </button>
+
+            {/* Sidebar - Responsive Backdrop */}
+            {isSidebarOpen && (
+                <div
+                    className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-30"
+                    onClick={() => setIsSidebarOpen(false)}
+                />
+            )}
+
+            {/* Sidebar */}
+            <aside className={clsx(
+                "fixed lg:relative inset-y-0 left-0 w-72 zyricon-glass border-r border-white/5 flex flex-col p-6 z-40 transition-transform duration-300 transform lg:translate-x-0",
+                isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+            )}>
+                <div className="flex items-center justify-between mb-10">
+                    <div className="flex items-center space-x-3 opacity-50 grayscale hover:grayscale-0 transition-all">
+                        <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
+                            <Sparkles className="w-4 h-4 text-purple-400" />
+                        </div>
+                        <span className="text-sm font-mono tracking-widest text-gray-500 uppercase">Gateway_Nexus</span>
                     </div>
-                    <span className="text-sm font-mono tracking-widest text-gray-500 uppercase">Gateway_Nexus</span>
+                    <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-gray-500 hover:text-white">
+                        <X className="w-5 h-5" />
+                    </button>
                 </div>
 
-                <button className="flex items-center space-x-3 w-full bg-white/5 hover:bg-white/10 transition-colors p-3 rounded-xl mb-8 border border-white/10 group">
+                <button
+                    onClick={handleNewChat}
+                    className="flex items-center space-x-3 w-full bg-purple-500/10 hover:bg-purple-500/20 transition-all p-3 rounded-xl mb-8 border border-purple-500/20 group shadow-[0_0_15px_rgba(168,85,247,0.05)]"
+                >
                     <Plus className="w-5 h-5 text-purple-500 group-hover:scale-110 transition-transform" />
-                    <span className="font-medium text-sm">New Chat</span>
+                    <span className="font-mono text-xs uppercase tracking-widest font-bold">New Chat</span>
                 </button>
 
                 <nav className="flex-1 space-y-6">
                     <div className="space-y-2">
-                        <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold px-3">Features</p>
-                        <NavItem icon={MessageSquare} label="Chat" active />
-                        <NavItem icon={Archive} label="Archived" />
-                        <NavItem icon={Library} label="Library" />
+                        <p className="text-[10px] uppercase tracking-widest text-gray-400/50 font-bold px-4 mb-4 font-mono">Features</p>
+                        <NavItem icon={MessageSquare} label="Chat" active={activeTab === 'Chat'} onClick={() => setActiveTab('Chat')} />
+                        <NavItem icon={Archive} label="Archived" active={activeTab === 'Archived'} onClick={() => setActiveTab('Archived')} />
+                        <NavItem icon={Library} label="Library" active={activeTab === 'Library'} onClick={() => setActiveTab('Library')} />
                     </div>
 
-                    <div className="space-y-2">
-                        <p className="text-[10px] uppercase tracking-widest text-gray-500 font-bold px-3">Workspaces</p>
-                        <NavItem icon={LayoutGrid} label="New Project" />
-                        <NavItem icon={ImageIcon} label="Image" />
-                        <NavItem icon={Presentation} label="Presentation" />
+                    <div className="space-y-2 pt-4">
+                        <p className="text-[10px] uppercase tracking-widest text-gray-400/50 font-bold px-4 mb-4 font-mono">Workspaces</p>
+                        <NavItem icon={LayoutGrid} label="New Project" active={activeTab === 'New Project'} onClick={() => setActiveTab('New Project')} />
+                        <NavItem icon={ImageIcon} label="Image" active={activeTab === 'Image'} onClick={() => setActiveTab('Image')} />
+                        <NavItem icon={Presentation} label="Presentation" active={activeTab === 'Presentation'} onClick={() => setActiveTab('Presentation')} />
                     </div>
                 </nav>
 
@@ -130,7 +172,11 @@ const GatituAIDashboard: React.FC = () => {
                                 {/* Action Chips */}
                                 <div className="flex flex-wrap justify-center gap-4 mb-2">
                                     {actionChips.map((chip) => (
-                                        <button key={chip.label} className="flex items-center space-x-2 px-6 py-3 rounded-full bg-white/5 border border-white/10 hover:border-purple-500/50 hover:bg-white/10 transition-all group">
+                                        <button
+                                            key={chip.label}
+                                            onClick={() => handleAction(chip.label)}
+                                            className="flex items-center space-x-2 px-6 py-3 rounded-full bg-white/5 border border-white/10 hover:border-purple-500/50 hover:bg-white/10 transition-all group"
+                                        >
                                             <chip.icon className="w-4 h-4 text-gray-400 group-hover:text-purple-500 transition-colors" />
                                             <span className="text-sm font-medium tracking-wide">{chip.label}</span>
                                         </button>
@@ -224,7 +270,11 @@ const GatituAIDashboard: React.FC = () => {
                     {messages.length === 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mt-12">
                             {featureCards.map((card) => (
-                                <div key={card.title} className="zyricon-glass p-6 rounded-2xl border border-white/5 hover:border-purple-500/30 transition-all group cursor-pointer">
+                                <div
+                                    key={card.title}
+                                    onClick={() => handleAction(card.title)}
+                                    className="zyricon-glass p-6 rounded-2xl border border-white/5 hover:border-purple-500/30 transition-all group cursor-pointer"
+                                >
                                     <div className="flex justify-between items-start mb-6">
                                         <div className="p-3 bg-white/5 rounded-xl group-hover:text-purple-500 transition-colors">
                                             <card.icon className="w-6 h-6" />
@@ -243,10 +293,13 @@ const GatituAIDashboard: React.FC = () => {
     );
 };
 
-const NavItem: React.FC<{ icon: any, label: string, active?: boolean }> = ({ icon: Icon, label, active }) => (
-    <button className={`flex items-center space-x-3 w-full px-4 py-3 rounded-xl transition-all text-sm font-mono uppercase tracking-widest ${active ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]' : 'text-gray-500 hover:bg-white/5 hover:text-white'}`}>
+const NavItem: React.FC<{ icon: any, label: string, active?: boolean, onClick?: () => void }> = ({ icon: Icon, label, active, onClick }) => (
+    <button
+        onClick={onClick}
+        className={`flex items-center space-x-3 w-full px-4 py-3 rounded-xl transition-all border ${active ? 'bg-purple-500/10 text-purple-400 border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]' : 'text-gray-500 hover:bg-white/5 hover:text-white border-transparent'}`}
+    >
         <Icon className="w-4 h-4" />
-        <span className="text-[10px]">{label}</span>
+        <span className="text-[10px] font-mono uppercase tracking-widest">{label}</span>
     </button>
 );
 
