@@ -15,6 +15,11 @@ View your app in AI Studio: https://ai.studio/apps/b922d27d-4e13-4c69-abd5-5ecdb
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
+2. Set the `VITE_TAMBO_API_KEY` in [.env](.env) to your Tambo API key.
+3. (Optional) Set `GEMINI_API_KEY` if using Gemini features.
+4. Run the app:
    `npm run dev`
+
+## Deployment
+
+When deploying to Vercel, ensure you add `VITE_TAMBO_API_KEY` to your Project Settings > Environment Variables.

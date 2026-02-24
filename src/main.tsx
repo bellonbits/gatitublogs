@@ -6,7 +6,7 @@ import App from './App.tsx';
 import './index.css';
 
 const TAMBO_CONFIG = {
-  apiKey: "apikey", // User reset this to placeholder
+  apiKey: import.meta.env.VITE_TAMBO_API_KEY || "apikey",
   userKey: "gatitu-user",
   components: tamboComponents,
 };
