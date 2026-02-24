@@ -1,61 +1,143 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Plus, MessageSquare, Archive, Library, LayoutGrid,
     Image as ImageIcon, Presentation, Code,
     Settings, Share2, Mic, ArrowUp, Paperclip,
     Sparkles, BrainCircuit, ClipboardList, Menu, X
 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useTambo, useTamboThreadInput, useTamboConfig } from '@tambo-ai/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
-import { useEffect } from 'react';
+import { Graph, InteractableNote } from './generative-ui';
+import RecipeCard from './RecipeCard';
+
+interface Message {
+    id: string;
+    role: 'user' | 'assistant';
+    content: string;
+    renderedComponent?: React.ReactNode;
+}
 
 const GatituAIDashboard: React.FC = () => {
     const [isGatituSidebarOpen, setIsGatituSidebarOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('Chat');
-    const { messages } = useTambo();
-    const { value, setValue, submit, isPending } = useTamboThreadInput();
-    const config = useTamboConfig();
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [value, setValue] = useState('');
+    const [isPending, setIsPending] = useState(false);
+
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
 
     useEffect(() => {
-        console.log('[GatituAI] Messages:', messages);
-        console.log('[GatituAI] Config:', config);
-    }, [messages, config]);
+        if (messages.length > 0) {
+            scrollToBottom();
+        }
+    }, [messages]);
+
+    useEffect(() => {
+        if (!isPending) {
+            scrollToBottom();
+        }
+    }, [isPending]);
 
     const handleSubmit = async (customValue?: string) => {
-        const messageToSubmit = customValue || value;
-        if (!messageToSubmit || isPending) return;
+        const text = customValue || value;
+        if (!text || isPending) return;
+
+        const userMsg: Message = { id: Date.now().toString(), role: 'user', content: text };
+        setMessages(prev => [...prev, userMsg]);
+        setValue('');
+        setIsPending(true);
+
+        const assistantId = (Date.now() + 1).toString();
+        const assistantMsg: Message = { id: assistantId, role: 'assistant', content: '' };
+        setMessages(prev => [...prev, assistantMsg]);
 
         try {
-            if (!customValue) {
-                console.log('[GatituAI] Submitting message:', value);
-                await submit();
-            } else {
-                setValue(customValue);
-                // Give state a moment to update if needed by the provider
-                setTimeout(async () => {
-                    console.log('[GatituAI] Submitting custom action:', customValue);
-                    await submit();
-                }, 50);
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: [
+                        ...messages.map(m => ({ role: m.role, content: m.content })),
+                        { role: 'user', content: text }
+                    ]
+                })
+            });
+
+            if (!response.ok) throw new Error('Failed to connect to Groq');
+
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder();
+            let fullContent = '';
+
+            if (reader) {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                if (data.content) {
+                                    fullContent += data.content;
+
+                                    // Parse for generative UI patterns
+                                    let renderedComponent = null;
+                                    if (fullContent.includes('```json [RECIPE_CARD]')) {
+                                        try {
+                                            const match = fullContent.match(/```json \[RECIPE_CARD\]\n([\s\S]*?)\n```/);
+                                            if (match) {
+                                                const props = JSON.parse(match[1]);
+                                                renderedComponent = <RecipeCard {...props} />;
+                                            }
+                                        } catch (e) { console.error('GenUI fail', e); }
+                                    } else if (fullContent.includes('```json [GRAPH]')) {
+                                        try {
+                                            const match = fullContent.match(/```json \[GRAPH\]\n([\s\S]*?)\n```/);
+                                            if (match) {
+                                                const props = JSON.parse(match[1]);
+                                                renderedComponent = <Graph {...props} />;
+                                            }
+                                        } catch (e) { console.error('GenUI fail', e); }
+                                    }
+
+                                    setMessages(prev => prev.map(m =>
+                                        m.id === assistantId ? { ...m, content: fullContent, renderedComponent } : m
+                                    ));
+                                }
+                            } catch (e) {
+                                console.error('Error parsing SSE chunk', e);
+                            }
+                        }
+                    }
+                }
             }
         } catch (err: any) {
             console.error('[GatituAI] Submit error:', err);
-            alert(`AI Error: ${err.message || 'Check your configuration'}`);
+            setMessages(prev => prev.map(m =>
+                m.id === assistantId ? { ...m, content: `Error: ${err.message}` } : m
+            ));
+        } finally {
+            setIsPending(false);
         }
     };
 
-    const handleAction = (prompt: string) => handleSubmit(prompt);
-
     const handleNewChat = () => {
+        setMessages([]);
         setValue('');
-        window.location.reload();
     };
-    const [activeWorkspace, setActiveWorkspace] = useState('New Project');
 
     const actionChips = [
-        { label: 'Create Image', icon: ImageIcon },
-        { label: 'Brainstorm', icon: BrainCircuit },
-        { label: 'Make a plan', icon: ClipboardList },
+        { label: 'Create Image', icon: ImageIcon, prompt: "Could you generate a creative architectural visualization concept for a floating eco-city?" },
+        { label: 'Presentation', icon: Presentation, prompt: "Help me prepare a keynote presentation about the future of AI in sustainable urban design." },
+        { label: 'Code Analysis', icon: Code, prompt: "Can you help me debug this React component and optimize its rendering performance?" },
     ];
 
     const featureCards = [
@@ -63,19 +145,22 @@ const GatituAIDashboard: React.FC = () => {
             title: 'Image Generator',
             desc: 'Create high-quality images instantly from text.',
             icon: ImageIcon,
-            action: 'Create Image'
+            action: 'Create Image',
+            prompt: "Could you generate a creative architectural visualization concept for a floating eco-city?"
         },
         {
             title: 'AI Presentation',
             desc: 'Turn ideas into engaging, professional presentations.',
             icon: Presentation,
-            action: 'Make Slides'
+            action: 'Make Slides',
+            prompt: "Help me prepare a keynote presentation about the future of AI in sustainable urban design."
         },
         {
             title: 'Dev Assistant',
             desc: 'Generate clean, production ready code in seconds.',
             icon: Code,
-            action: 'Generate Code'
+            action: 'Generate Code',
+            prompt: "Can you help me debug this React component and optimize its rendering performance?"
         },
     ];
 
@@ -88,14 +173,6 @@ const GatituAIDashboard: React.FC = () => {
             >
                 <Menu className="w-5 h-5" />
             </button>
-
-            {/* Sidebar - Responsive Backdrop */}
-            {isGatituSidebarOpen && (
-                <div
-                    className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-30"
-                    onClick={() => setIsGatituSidebarOpen(false)}
-                />
-            )}
 
             {/* Sidebar */}
             <aside className={clsx(
@@ -137,24 +214,13 @@ const GatituAIDashboard: React.FC = () => {
                         <NavItem icon={Presentation} label="Presentation" active={activeTab === 'Presentation'} onClick={() => setActiveTab('Presentation')} />
                     </div>
                 </nav>
-
-                <div className="mt-auto p-4 rounded-2xl bg-gradient-to-br from-purple-900/40 to-[#09080b] border border-purple-500/20 relative overflow-hidden group">
-                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all" />
-                    <p className="text-white font-bold text-sm mb-1">Upgrade to premium</p>
-                    <p className="text-[10px] text-gray-400 mb-4 leading-tight">Boost productivity with seamless automation and responsive AI, built to adapt to your needs.</p>
-                    <button className="w-full py-2 bg-white/10 hover:bg-white/20 transition-colors rounded-lg text-sm font-medium border border-white/5">Upgrade</button>
-                </div>
             </aside>
 
             {/* Main Content */}
             <main className="flex-1 relative flex flex-col p-8 overflow-hidden bg-black">
-                {/* Background Glows */}
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] zyricon-radial-glow -z-10 opacity-50" />
-
-                {/* Header */}
                 <header className="flex justify-between items-center px-4 mb-8">
                     <div className="flex items-center space-x-2 bg-white/5 px-4 py-2 rounded-xl border border-white/5 hover:bg-white/10 cursor-pointer transition-all">
-                        <span className="text-sm font-medium">Llama 3 (Groq)</span>
+                        <span className="text-sm font-medium">Llama 3 (Groq Direct)</span>
                         <ArrowUp className="w-4 h-4 rotate-180 text-gray-500" />
                     </div>
 
@@ -163,46 +229,33 @@ const GatituAIDashboard: React.FC = () => {
                             <Settings className="w-4 h-4" />
                             <span>Configuration</span>
                         </button>
-                        <button className="flex items-center space-x-2 bg-purple-500 px-4 py-2 rounded-xl hover:bg-purple-500/80 transition-all text-sm font-medium shadow-[0_0_20px_rgba(168,85,247,0.3)]">
-                            <Share2 className="w-4 h-4" />
-                            <span>Export</span>
-                        </button>
                     </div>
                 </header>
 
-                {/* Messaging Area */}
                 <div className="flex-1 overflow-y-auto custom-scrollbar px-4 w-full flex flex-col items-center">
                     <div className="w-full max-w-4xl flex-1 flex flex-col">
                         {messages.length === 0 ? (
                             <div className="flex-1 flex flex-col items-center justify-center -mt-12">
-                                {/* Hero Section */}
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="mb-12 text-center animate-float"
+                                    className="mb-12 text-center"
                                 >
-                                    <div className="relative w-20 h-20 mx-auto mb-8">
-                                        <div className="absolute inset-0 bg-purple-500/40 rounded-full blur-xl animate-pulse" />
-                                        <div className="relative w-full h-full bg-gradient-to-tr from-purple-500 to-blue-400 rounded-full p-1">
-                                            <div className="w-full h-full bg-[#09080b] rounded-full flex items-center justify-center">
-                                                <Sparkles className="w-10 h-10 text-white" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 text-glow tracking-tighter font-mono">GATITU<span className="text-purple-500">.AI</span></h1>
-                                    <p className="text-cyber-gray max-w-lg mx-auto font-mono text-xs uppercase tracking-[0.3em]">Groq-Powered Intelligence // v4.0.2</p>
+                                    <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 tracking-tighter font-mono">GATITU<span className="text-purple-500">.AI</span></h1>
+                                    <p className="text-gray-500 font-mono text-xs uppercase tracking-[0.3em]">Groq Direct Implementation // v5.0.0</p>
                                 </motion.div>
 
-                                {/* Action Chips */}
                                 <div className="flex flex-wrap justify-center gap-4 mb-2">
-                                    {actionChips.map((chip) => (
+                                    {actionChips.map(chip => (
                                         <button
                                             key={chip.label}
-                                            onClick={() => handleAction(chip.label)}
-                                            className="flex items-center space-x-2 px-6 py-3 rounded-full bg-white/5 border border-white/10 hover:border-purple-500/50 hover:bg-white/10 transition-all group"
+                                            onClick={() => handleSubmit(chip.prompt)}
+                                            className="flex items-center space-x-3 p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all group"
                                         >
-                                            <chip.icon className="w-4 h-4 text-gray-400 group-hover:text-purple-500 transition-colors" />
-                                            <span className="text-sm font-medium tracking-wide">{chip.label}</span>
+                                            <div className="p-2 bg-white/5 rounded-xl group-hover:scale-110 transition-transform">
+                                                <chip.icon className="w-4 h-4 text-purple-400" />
+                                            </div>
+                                            <span className="text-xs font-light text-gray-400">{chip.label}</span>
                                         </button>
                                     ))}
                                 </div>
@@ -211,25 +264,19 @@ const GatituAIDashboard: React.FC = () => {
                             <div className="w-full space-y-8 py-8">
                                 {messages.map((message) => (
                                     <div key={message.id} className={`flex flex-col ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
-                                        <div className={`max-w-[85%] p-5 rounded-3xl ${message.role === 'user' ? 'bg-purple-600 text-white shadow-[0_0_20px_rgba(147,51,234,0.2)]' : 'zyricon-glass border border-white/5 text-[#d1d5db]'}`}>
-                                            <div className="text-sm leading-relaxed prose prose-invert prose-sm max-w-none">
-                                                {typeof message.content === 'string'
-                                                    ? message.content
-                                                    : Array.isArray(message.content)
-                                                        ? message.content.map((part, i) => (part.type === 'text' ? part.text : null))
-                                                        : String(message.content)
-                                                }
+                                        <div className={clsx(
+                                            "max-w-[80%] rounded-3xl p-4 zyricon-glass border border-white/5",
+                                            message.role === 'user' ? "bg-purple-500/10" : ""
+                                        )}>
+                                            <div className="text-sm font-light leading-relaxed whitespace-pre-wrap">
+                                                {message.content}
                                             </div>
+                                            {message.renderedComponent && (
+                                                <div className="mt-4">
+                                                    {message.renderedComponent}
+                                                </div>
+                                            )}
                                         </div>
-                                        {(message as any).renderedComponent && (
-                                            <motion.div
-                                                initial={{ opacity: 0, scale: 0.95 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                className="w-full mt-4"
-                                            >
-                                                {(message as any).renderedComponent}
-                                            </motion.div>
-                                        )}
                                     </div>
                                 ))}
                                 {isPending && (
@@ -244,14 +291,13 @@ const GatituAIDashboard: React.FC = () => {
                                         </div>
                                     </div>
                                 )}
+                                <div ref={messagesEndRef} />
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Input & Features Center Container */}
                 <div className="w-full flex flex-col items-center px-4 pb-8">
-                    {/* Search Input Box */}
                     <div className="w-full max-w-3xl">
                         <div className="zyricon-glass border border-white/10 rounded-2xl p-4 shadow-2xl">
                             <div className="flex items-start space-x-3 mb-4">
@@ -272,24 +318,12 @@ const GatituAIDashboard: React.FC = () => {
 
                             <div className="flex items-center justify-between border-t border-white/5 pt-4">
                                 <div className="flex items-center space-x-4">
-                                    <button className="flex items-center space-x-2 text-gray-500 hover:text-white transition-colors text-sm font-medium">
+                                    <button className="p-2 text-gray-500 hover:text-white transition-colors rounded-xl bg-white/5">
                                         <Paperclip className="w-4 h-4" />
-                                        <span className="hidden sm:inline">Attach</span>
-                                    </button>
-                                    <button className="flex items-center space-x-2 text-gray-500 hover:text-white transition-colors text-sm font-medium">
-                                        <Settings className="w-4 h-4" />
-                                        <span className="hidden sm:inline">Settings</span>
-                                    </button>
-                                    <button className="flex items-center space-x-2 text-gray-500 hover:text-white transition-colors text-sm font-medium">
-                                        <LayoutGrid className="w-4 h-4" />
-                                        <span className="hidden sm:inline">Options</span>
                                     </button>
                                 </div>
 
                                 <div className="flex items-center space-x-2">
-                                    <button className="p-2 text-gray-500 hover:text-white transition-colors rounded-xl bg-white/5">
-                                        <Mic className="w-4 h-4" />
-                                    </button>
                                     <button
                                         onClick={() => handleSubmit()}
                                         disabled={!value || isPending}
@@ -302,24 +336,22 @@ const GatituAIDashboard: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Feature Cards - Only show on Home */}
                     {messages.length === 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mt-12">
                             {featureCards.map((card) => (
-                                <div
+                                <button
                                     key={card.title}
-                                    onClick={() => handleAction(card.title)}
-                                    className="zyricon-glass p-6 rounded-2xl border border-white/5 hover:border-purple-500/30 transition-all group cursor-pointer"
+                                    onClick={() => handleSubmit(card.prompt)}
+                                    className="zyricon-glass p-6 rounded-2xl border border-white/5 hover:border-purple-500/30 transition-all group text-left"
                                 >
                                     <div className="flex justify-between items-start mb-6">
                                         <div className="p-3 bg-white/5 rounded-xl group-hover:text-purple-500 transition-colors">
                                             <card.icon className="w-6 h-6" />
                                         </div>
-                                        <span className="text-[10px] uppercase font-bold tracking-widest text-gray-500 bg-white/5 px-2 py-1 rounded-md">{card.action}</span>
                                     </div>
                                     <h3 className="text-white font-bold mb-2">{card.title}</h3>
                                     <p className="text-sm text-gray-500 leading-relaxed font-medium">{card.desc}</p>
-                                </div>
+                                </button>
                             ))}
                         </div>
                     )}

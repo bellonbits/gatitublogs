@@ -16,6 +16,7 @@ from .auth import (
     create_access_token, 
     get_current_user
 )
+from .chat import router as chat_router
 
 # Configure Logging
 logging.basicConfig(level=logging.INFO)
@@ -36,6 +37,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(chat_router)
 
 @app.on_event("startup")
 def on_startup():
