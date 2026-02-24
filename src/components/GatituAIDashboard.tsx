@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
+import ReactMarkdown from 'react-markdown';
 import { Graph, InteractableNote } from './generative-ui';
 import RecipeCard from './RecipeCard';
 
@@ -265,14 +266,16 @@ const GatituAIDashboard: React.FC = () => {
                                 {messages.map((message) => (
                                     <div key={message.id} className={`flex flex-col ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
                                         <div className={clsx(
-                                            "max-w-[80%] rounded-3xl p-4 zyricon-glass border border-white/5",
-                                            message.role === 'user' ? "bg-purple-500/10" : ""
+                                            "max-w-[80%] rounded-3xl p-5 zyricon-glass border border-white/5",
+                                            message.role === 'user' ? "bg-purple-600/30 text-white shadow-[0_0_20px_rgba(147,51,234,0.15)]" : ""
                                         )}>
-                                            <div className="text-sm font-light leading-relaxed whitespace-pre-wrap">
-                                                {message.content}
+                                            <div className="text-sm font-light leading-relaxed whitespace-normal prose prose-invert prose-p:leading-relaxed prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10 prose-headings:font-bold prose-headings:text-white prose-a:text-purple-400">
+                                                <ReactMarkdown>
+                                                    {message.content.replace(/```json \[(RECIPE_CARD|GRAPH)\][\s\S]*?```/g, '').trim()}
+                                                </ReactMarkdown>
                                             </div>
                                             {message.renderedComponent && (
-                                                <div className="mt-4">
+                                                <div className="mt-6">
                                                     {message.renderedComponent}
                                                 </div>
                                             )}
