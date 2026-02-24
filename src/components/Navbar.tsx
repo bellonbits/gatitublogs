@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Terminal, Code, Cpu, Layers, User } from 'lucide-react';
+import { Menu, X, Terminal, Code, Cpu, Layers, User, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import clsx from 'clsx';
 import Button from './Button.tsx';
@@ -12,6 +12,7 @@ const Navbar = () => {
   const links = [
     { name: 'Home', path: '/', icon: Terminal },
     { name: 'AI Systems', path: '/category/ai', icon: Cpu },
+    { name: 'Gatitu AI', path: '/ai', icon: Sparkles },
     { name: 'Backend', path: '/category/backend', icon: Layers },
     { name: 'Frontend', path: '/category/frontend', icon: Code },
     { name: 'Architect', path: '/about', icon: User },

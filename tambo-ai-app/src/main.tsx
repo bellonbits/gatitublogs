@@ -6,7 +6,7 @@ import './index.css'
 import App from './App.tsx'
 
 const TAMBO_CONFIG = {
-  apiKey: "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",
+  apiKey: "apikey",
   model: "meta-llama/llama-4-maverick-17b-128e-instruct",
   components: tamboComponents,
 };

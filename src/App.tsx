@@ -6,6 +6,7 @@ import Home from './pages/Home.tsx';
 import PostView from './pages/PostView.tsx';
 import CategoryView from './pages/CategoryView.tsx';
 import About from './pages/About.tsx';
+import GatituAIDashboard from './components/GatituAIDashboard.tsx';
 import AdminLogin from './pages/AdminLogin.tsx';
 import AdminDashboard from './pages/AdminDashboard.tsx';
 import AdminEditor from './pages/AdminEditor.tsx';
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="post/:slug" element={<PostView />} />
             <Route path="category/:category" element={<CategoryView />} />
             <Route path="about" element={<About />} />
+            <Route path="ai" element={<GatituAIDashboard />} />
           </Route>
 
           {/* Admin Routes */}
