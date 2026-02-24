@@ -14,6 +14,8 @@ const GatituAIDashboard: React.FC = () => {
     const { messages } = useTambo();
     const { value, setValue, submit, isPending } = useTamboThreadInput();
     const config = useTamboConfig();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('Chat');
 
     useEffect(() => {
         console.log('[GatituAI] Messages:', messages);
