@@ -6,7 +6,7 @@ import App from './App.tsx';
 import './index.css';
 
 const TAMBO_CONFIG = {
-  apiKey: "apikey", // User reset this to placeholder
+  apiKey: "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", // User reset this to placeholder
   model: "groq/meta-llama/llama-4-maverick-17b-128e-instruct",
   components: tamboComponents,
 };
