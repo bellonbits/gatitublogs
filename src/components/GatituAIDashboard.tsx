@@ -11,11 +11,11 @@ import clsx from 'clsx';
 import { useEffect } from 'react';
 
 const GatituAIDashboard: React.FC = () => {
+    const [isGatituSidebarOpen, setIsGatituSidebarOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('Chat');
     const { messages } = useTambo();
     const { value, setValue, submit, isPending } = useTamboThreadInput();
     const config = useTamboConfig();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('Chat');
 
     useEffect(() => {
         console.log('[GatituAI] Messages:', messages);
@@ -83,24 +83,24 @@ const GatituAIDashboard: React.FC = () => {
         <div className="flex h-[calc(100vh-80px)] w-full bg-[#09080b] text-[#d1d5db] overflow-hidden font-sans relative">
             {/* Mobile Sidebar Toggle */}
             <button
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                onClick={() => setIsGatituSidebarOpen(!isGatituSidebarOpen)}
                 className="lg:hidden absolute top-4 left-4 z-50 p-2 bg-white/5 border border-white/10 rounded-lg text-gray-400 hover:text-white transition-all shadow-xl"
             >
                 <Menu className="w-5 h-5" />
             </button>
 
             {/* Sidebar - Responsive Backdrop */}
-            {isSidebarOpen && (
+            {isGatituSidebarOpen && (
                 <div
                     className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-30"
-                    onClick={() => setIsSidebarOpen(false)}
+                    onClick={() => setIsGatituSidebarOpen(false)}
                 />
             )}
 
             {/* Sidebar */}
             <aside className={clsx(
                 "fixed lg:relative inset-y-0 left-0 w-72 zyricon-glass border-r border-white/5 flex flex-col p-6 z-40 transition-transform duration-300 transform lg:translate-x-0",
-                isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                isGatituSidebarOpen ? "translate-x-0" : "-translate-x-full"
             )}>
                 <div className="flex items-center justify-between mb-10">
                     <div className="flex items-center space-x-3 opacity-50 grayscale hover:grayscale-0 transition-all">
@@ -109,7 +109,7 @@ const GatituAIDashboard: React.FC = () => {
                         </div>
                         <span className="text-sm font-mono tracking-widest text-gray-500 uppercase">Gateway_Nexus</span>
                     </div>
-                    <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-gray-500 hover:text-white">
+                    <button onClick={() => setIsGatituSidebarOpen(false)} className="lg:hidden text-gray-500 hover:text-white">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
