@@ -65,18 +65,49 @@ async def login(request: Request, session: Session = Depends(get_session)):
         username = data.get("username")
         password = data.get("password")
         
+        logger.info(f"Login attempt for user: {username}")
+        
         user = session.exec(select(User).where(User.username == username)).first()
-        if not user or not verify_password(password, user.password):
+        if not user:
+            logger.warning(f"Login failed: User {username} not found")
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+            
+        if not verify_password(password, user.password):
+            logger.warning(f"Login failed: Password mismatch for user {username}")
             raise HTTPException(status_code=401, detail="Invalid credentials")
         
         access_token = create_access_token(data={"sub": user.username})
+        logger.info(f"Login successful for user: {username}")
         return {
             "token": access_token,
             "user": {"id": user.id, "username": user.username, "role": user.role}
         }
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Login error: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.post("/api/auth/reset-admin")
+async def reset_admin(session: Session = Depends(get_session)):
+    try:
+        # Force reset admin password to admin123
+        admin = session.exec(select(User).where(User.username == "admin")).first()
+        hashed_pwd = get_password_hash("admin123")
+        
+        if admin:
+            admin.password = hashed_pwd
+            logger.info("Admin password reset to 'admin123'")
+        else:
+            admin = User(username="admin", password=hashed_pwd, role="admin")
+            session.add(admin)
+            logger.info("Admin user created via reset endpoint")
+            
+        session.commit()
+        return {"message": "Admin password has been reset to 'admin123'"}
+    except Exception as e:
+        logger.error(f"Reset admin error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/auth/verify")
 async def verify(username: str = Depends(get_current_user), session: Session = Depends(get_session)):
