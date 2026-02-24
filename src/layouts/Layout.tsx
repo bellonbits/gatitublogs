@@ -1,17 +1,17 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar.tsx';
 import Footer from '../components/Footer.tsx';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion'; // Corrected import based on common usage for motion/react
 
 const Layout = () => {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-dark-bg text-white relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-dark-bg text-white relative overflow-hidden font-sans flex flex-col">
       {/* Background Layers */}
       <div className="grid-background" />
       <div className="grain-overlay" />
-      
+
       {/* Ambient Glows */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-neon-green/5 rounded-full blur-[150px]" />
@@ -19,8 +19,8 @@ const Layout = () => {
       </div>
 
       <Navbar />
-      
-      <main className="relative z-10 pt-20 min-h-[calc(100vh-80px)]">
+
+      <main className="relative z-10 pt-20">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}

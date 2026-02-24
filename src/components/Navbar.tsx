@@ -68,9 +68,11 @@ const Navbar = () => {
 
           {/* Social / Action Buttons */}
           <div className="hidden md:flex items-center ml-4 pl-4 border-l border-white/10">
-            <Button size="sm" variant="outline" className="h-9 font-mono text-[10px] tracking-widest border-neon-green/30 text-neon-green">
-              GATEWAY_OPEN
-            </Button>
+            <Link to="/ai">
+              <Button size="sm" variant="outline" className="h-9 font-mono text-[10px] tracking-widest border-neon-green/30 text-neon-green">
+                GATEWAY_OPEN
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
