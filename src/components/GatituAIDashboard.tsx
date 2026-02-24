@@ -22,34 +22,33 @@ const GatituAIDashboard: React.FC = () => {
         console.log('[GatituAI] Config:', config);
     }, [messages, config]);
 
-    const handleAction = async (prompt: string) => {
-        try {
-            setValue(prompt);
-            // Wait for state to update
-            setTimeout(async () => {
-                console.log('[GatituAI] Submitting via action:', prompt);
-                await submit();
-            }, 100);
-        } catch (err) {
-            console.error('[GatituAI] Action submit error:', err);
-        }
-    };
+    const handleSubmit = async (customValue?: string) => {
+        const messageToSubmit = customValue || value;
+        if (!messageToSubmit || isPending) return;
 
-    const handleSubmit = async () => {
         try {
-            console.log('[GatituAI] Submitting message:', value);
-            await submit();
+            if (!customValue) {
+                console.log('[GatituAI] Submitting message:', value);
+                await submit();
+            } else {
+                setValue(customValue);
+                // Give state a moment to update if needed by the provider
+                setTimeout(async () => {
+                    console.log('[GatituAI] Submitting custom action:', customValue);
+                    await submit();
+                }, 50);
+            }
         } catch (err: any) {
             console.error('[GatituAI] Submit error:', err);
-            alert(`AI Error: ${err.message || 'Check your API key in .env'}`);
+            alert(`AI Error: ${err.message || 'Check your configuration'}`);
         }
     };
 
+    const handleAction = (prompt: string) => handleSubmit(prompt);
+
     const handleNewChat = () => {
-        // Usually Tambo threads are managed via URL or context
-        // For now we'll just clear the input and notify user functionality is ready
         setValue('');
-        window.location.reload(); // Simple way to start fresh if state is volatile
+        window.location.reload();
     };
     const [activeWorkspace, setActiveWorkspace] = useState('New Project');
 
@@ -233,6 +232,18 @@ const GatituAIDashboard: React.FC = () => {
                                         )}
                                     </div>
                                 ))}
+                                {isPending && (
+                                    <div className="flex flex-col items-start">
+                                        <div className="zyricon-glass border border-white/5 p-4 rounded-3xl flex items-center space-x-2">
+                                            <div className="flex space-x-1">
+                                                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                                                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                                                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce" />
+                                            </div>
+                                            <span className="text-xs font-mono text-gray-500 animate-pulse uppercase tracking-widest">Thinking...</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -251,7 +262,7 @@ const GatituAIDashboard: React.FC = () => {
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter' && !e.shiftKey) {
                                             e.preventDefault();
-                                            submit();
+                                            handleSubmit();
                                         }
                                     }}
                                     placeholder="Ask Anything..."
@@ -280,7 +291,7 @@ const GatituAIDashboard: React.FC = () => {
                                         <Mic className="w-4 h-4" />
                                     </button>
                                     <button
-                                        onClick={handleSubmit}
+                                        onClick={() => handleSubmit()}
                                         disabled={!value || isPending}
                                         className="p-2 bg-purple-500 text-white rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:bg-purple-500/80 disabled:opacity-50 transition-all"
                                     >
