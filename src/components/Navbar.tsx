@@ -30,10 +30,10 @@ const Navbar = () => {
               <Terminal className="w-6 h-6 text-neon-green" />
             </motion.div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold font-mono tracking-tighter text-white leading-none">
+              <span className="text-lg sm:text-xl font-bold font-mono tracking-tighter text-white leading-none">
                 GATITU<span className="text-neon-green">.TECH</span>
               </span>
-              <span className="text-[8px] font-mono text-neon-green/60 uppercase tracking-[0.4em] mt-1 hidden sm:block">
+              <span className="text-[7px] sm:text-[8px] font-mono text-neon-green/60 uppercase tracking-[0.3em] sm:tracking-[0.4em] mt-1 hidden xs:block">
                 // System v4.0.2
               </span>
             </div>

@@ -57,14 +57,14 @@ const Home = () => {
           >
             <h1
               ref={titleRef}
-              className="text-7xl md:text-9xl font-bold font-mono tracking-tighter mb-8 text-white text-glow selection:bg-neon-green selection:text-black"
+              className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-bold font-mono tracking-tighter mb-8 text-white text-glow selection:bg-neon-green selection:text-black leading-none"
             >
               GATITU<span className="text-neon-green">.TECH</span>
             </h1>
-            <p className="text-xl md:text-2xl text-cyber-gray font-light mb-12 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-2xl text-cyber-gray font-light mb-12 max-w-3xl mx-auto leading-relaxed px-4">
               Architecting the future through high-performance systems and
               <span className="text-white font-medium"> cinematic engineering.</span>
-              <span className="block text-xs mt-6 text-neon-green font-mono uppercase tracking-[0.3em] opacity-80 animate-pulse">
+              <span className="block text-[10px] sm:text-xs mt-6 text-neon-green font-mono uppercase tracking-[0.2em] sm:tracking-[0.3em] opacity-80 animate-pulse">
                 [ CONNECTION ESTABLISHED // SIGNAL STABLE ]
               </span>
             </p>
