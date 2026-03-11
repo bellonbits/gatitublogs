@@ -18,9 +18,10 @@ async def chat_endpoint(request: Request):
         
         # Filter out empty assistant messages to prevent 'blank' responses from model
         messages = [m for m in messages if m.get("content") or m.get("role") == "user"]
-        
+
         async def generate():
             try:
+                # Use a stable, high-performance model
                 chat_completion = client.chat.completions.create(
                     messages=messages,
                     model="llama-3.3-70b-versatile",
@@ -28,10 +29,10 @@ async def chat_endpoint(request: Request):
                 )
                 
                 for chunk in chat_completion:
-                    if chunk.choices[0].delta.content:
+                    if hasattr(chunk.choices[0], 'delta') and hasattr(chunk.choices[0].delta, 'content'):
                         content = chunk.choices[0].delta.content
-                        # Standard SSE format: data: <payload>\n\n
-                        yield f"data: {json.dumps({'content': content})}\n\n"
+                        if content:
+                            yield f"data: {json.dumps({'content': content})}\n\n"
                         
             except Exception as e:
                 logger.error(f"Groq Stream Error: {str(e)}")

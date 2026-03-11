@@ -227,7 +227,7 @@ const GatituAIDashboard: React.FC = () => {
             <main className="flex-1 relative flex flex-col p-4 sm:p-8 overflow-hidden bg-black pt-16 sm:pt-8">
                 <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 mb-8 space-y-4 sm:space-y-0">
                     <div className="flex items-center space-x-2 bg-white/5 px-4 py-2 rounded-xl border border-white/5 hover:bg-white/10 cursor-pointer transition-all">
-                        <span className="text-xs sm:text-sm font-medium">Llama 3 (Groq Direct)</span>
+                        <span className="text-xs sm:text-sm font-medium">Llama 3.3 (Groq Direct)</span>
                         <ArrowUp className="w-4 h-4 rotate-180 text-gray-500" />
                     </div>
 
@@ -294,59 +294,70 @@ const GatituAIDashboard: React.FC = () => {
                                             message.role === 'user' ? "bg-purple-600/30 text-white shadow-[0_0_20px_rgba(147,51,234,0.15)]" : ""
                                         )}>
                                             <div className="text-sm font-light leading-relaxed whitespace-normal text-gray-300">
-                                                <ReactMarkdown
-                                                    remarkPlugins={[remarkGfm]}
-                                                    components={{
-                                                        h1: ({ node, ...props }) => <h1 className="text-2xl font-bold text-white mt-8 mb-4 tracking-tight" {...props} />,
-                                                        h2: ({ node, ...props }) => <h2 className="text-xl font-bold text-white mt-6 mb-3 tracking-tight" {...props} />,
-                                                        h3: ({ node, ...props }) => <h3 className="text-lg font-semibold text-white mt-5 mb-2" {...props} />,
-                                                        p: ({ node, ...props }) => <p className="mb-4 last:mb-0 leading-relaxed" {...props} />,
-                                                        ul: ({ node, ...props }) => <ul className="list-disc mb-4 pl-5 space-y-2 marker:text-purple-500" {...props} />,
-                                                        ol: ({ node, ...props }) => <ol className="list-decimal mb-4 pl-5 space-y-2 marker:text-purple-500 font-mono marker:text-sm" {...props} />,
-                                                        li: ({ node, ...props }) => <li className="pl-1 leading-relaxed" {...props} />,
-                                                        strong: ({ node, ...props }) => <strong className="font-semibold text-purple-100 bg-white/5 px-1 rounded" {...props} />,
-                                                        a: ({ node, ...props }) => <a className="text-purple-400 hover:text-purple-300 underline underline-offset-4 decoration-purple-500/30 hover:decoration-purple-400 transition-all font-medium" {...props} />,
-                                                        blockquote: ({ node, ...props }) => <blockquote className="border-l-2 border-purple-500 pl-4 py-2 my-5 bg-purple-500/5 text-gray-400 rounded-r-xl italic" {...props} />,
-                                                        table: ({ node, ...props }) => (
-                                                            <div className="my-6 w-full overflow-x-auto rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl">
-                                                                <table className="w-full text-left border-collapse" {...props} />
-                                                            </div>
-                                                        ),
-                                                        thead: ({ node, ...props }) => <thead className="bg-white/5 border-b border-white/10" {...props} />,
-                                                        th: ({ node, ...props }) => <th className="px-5 py-3 text-xs font-mono uppercase tracking-wider text-purple-400 font-bold" {...props} />,
-                                                        td: ({ node, ...props }) => <td className="px-5 py-3 text-sm border-t border-white/5 text-gray-300 font-mono" {...props} />,
-                                                        tr: ({ node, ...props }) => <tr className="hover:bg-white/[0.02] transition-colors" {...props} />,
-                                                        code({ node, inline, className, children, ...props }: any) {
-                                                            const match = /language-(\w+)/.exec(className || '')
-                                                            return !inline && match ? (
-                                                                <div className="rounded-xl overflow-hidden mt-6 mb-6 border border-white/10 shadow-2xl bg-[#09080b]">
-                                                                    <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10 zyricon-glass">
-                                                                        <span className="text-xs font-mono text-gray-400 capitalize">{match[1]}</span>
-                                                                        <div className="flex space-x-2">
-                                                                            <div className="w-2.5 h-2.5 rounded-full bg-red-500/80 hover:bg-red-400 transition-colors cursor-pointer"></div>
-                                                                            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 hover:bg-yellow-400 transition-colors cursor-pointer"></div>
-                                                                            <div className="w-2.5 h-2.5 rounded-full bg-green-500/80 hover:bg-green-400 transition-colors cursor-pointer"></div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <SyntaxHighlighter
-                                                                        {...props}
-                                                                        PreTag="div"
-                                                                        children={String(children).replace(/\n$/, '')}
-                                                                        language={match[1]}
-                                                                        style={vscDarkPlus}
-                                                                        customStyle={{ margin: 0, padding: '1.5rem', background: 'transparent', fontSize: '0.875rem' }}
-                                                                    />
+                                                {!message.content && message.role === 'assistant' ? (
+                                                    <div className="flex items-center space-x-3 py-1">
+                                                        <div className="flex space-x-1">
+                                                            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                                                            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                                                            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce" />
+                                                        </div>
+                                                        <span className="text-[10px] font-mono text-purple-400/60 uppercase tracking-widest animate-pulse">Initializing Nexus...</span>
+                                                    </div>
+                                                ) : (
+                                                    <ReactMarkdown
+                                                        remarkPlugins={[remarkGfm]}
+                                                        components={{
+                                                            h1: ({ node, ...props }) => <h1 className="text-2xl font-bold text-white mt-8 mb-4 tracking-tight" {...props} />,
+                                                            h2: ({ node, ...props }) => <h2 className="text-xl font-bold text-white mt-6 mb-3 tracking-tight" {...props} />,
+                                                            h3: ({ node, ...props }) => <h3 className="text-lg font-semibold text-white mt-5 mb-2" {...props} />,
+                                                            p: ({ node, ...props }) => <p className="mb-4 last:mb-0 leading-relaxed" {...props} />,
+                                                            ul: ({ node, ...props }) => <ul className="list-disc mb-4 pl-5 space-y-2 marker:text-purple-500" {...props} />,
+                                                            ol: ({ node, ...props }) => <ol className="list-decimal mb-4 pl-5 space-y-2 marker:text-purple-500 font-mono marker:text-sm" {...props} />,
+                                                            li: ({ node, ...props }) => <li className="pl-1 leading-relaxed" {...props} />,
+                                                            strong: ({ node, ...props }) => <strong className="font-semibold text-purple-100 bg-white/5 px-1 rounded" {...props} />,
+                                                            a: ({ node, ...props }) => <a className="text-purple-400 hover:text-purple-300 underline underline-offset-4 decoration-purple-500/30 hover:decoration-purple-400 transition-all font-medium" {...props} />,
+                                                            blockquote: ({ node, ...props }) => <blockquote className="border-l-2 border-purple-500 pl-4 py-2 my-5 bg-purple-500/5 text-gray-400 rounded-r-xl italic" {...props} />,
+                                                            table: ({ node, ...props }) => (
+                                                                <div className="my-6 w-full overflow-x-auto rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl">
+                                                                    <table className="w-full text-left border-collapse" {...props} />
                                                                 </div>
-                                                            ) : (
-                                                                <code {...props} className="bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded-md font-mono text-[13px] border border-purple-500/20">
-                                                                    {children}
-                                                                </code>
-                                                            )
-                                                        }
-                                                    }}
-                                                >
-                                                    {message.content.replace(/```json \[(RECIPE_CARD|GRAPH)\][\s\S]*?```/g, '').trim()}
-                                                </ReactMarkdown>
+                                                            ),
+                                                            thead: ({ node, ...props }) => <thead className="bg-white/5 border-b border-white/10" {...props} />,
+                                                            th: ({ node, ...props }) => <th className="px-5 py-3 text-xs font-mono uppercase tracking-wider text-purple-400 font-bold" {...props} />,
+                                                            td: ({ node, ...props }) => <td className="px-5 py-3 text-sm border-t border-white/5 text-gray-300 font-mono" {...props} />,
+                                                            tr: ({ node, ...props }) => <tr className="hover:bg-white/[0.02] transition-colors" {...props} />,
+                                                            code({ node, inline, className, children, ...props }: any) {
+                                                                const match = /language-(\w+)/.exec(className || '')
+                                                                return !inline && match ? (
+                                                                    <div className="rounded-xl overflow-hidden mt-6 mb-6 border border-white/10 shadow-2xl bg-[#09080b]">
+                                                                        <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10 zyricon-glass">
+                                                                            <span className="text-xs font-mono text-gray-400 capitalize">{match[1]}</span>
+                                                                            <div className="flex space-x-2">
+                                                                                <div className="w-2.5 h-2.5 rounded-full bg-red-500/80 hover:bg-red-400 transition-colors cursor-pointer"></div>
+                                                                                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 hover:bg-yellow-400 transition-colors cursor-pointer"></div>
+                                                                                <div className="w-2.5 h-2.5 rounded-full bg-green-500/80 hover:bg-green-400 transition-colors cursor-pointer"></div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <SyntaxHighlighter
+                                                                            {...props}
+                                                                            PreTag="div"
+                                                                            children={String(children).replace(/\n$/, '')}
+                                                                            language={match[1]}
+                                                                            style={vscDarkPlus}
+                                                                            customStyle={{ margin: 0, padding: '1.5rem', background: 'transparent', fontSize: '0.875rem' }}
+                                                                        />
+                                                                    </div>
+                                                                ) : (
+                                                                    <code {...props} className="bg-purple-500/20 text-purple-300 px-1.5 py-0.5 rounded-md font-mono text-[13px] border border-purple-500/20">
+                                                                        {children}
+                                                                    </code>
+                                                                )
+                                                            }
+                                                        }}
+                                                    >
+                                                        {message.content.replace(/```json \[(RECIPE_CARD|GRAPH)\][\s\S]*?```/g, '').trim()}
+                                                    </ReactMarkdown>
+                                                )}
                                             </div>
                                             {message.renderedComponent && (
                                                 <div className="mt-6">
