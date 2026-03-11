@@ -8,6 +8,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Graph, InteractableNote } from './generative-ui';
@@ -294,6 +295,7 @@ const GatituAIDashboard: React.FC = () => {
                                         )}>
                                             <div className="text-sm font-light leading-relaxed whitespace-normal text-gray-300">
                                                 <ReactMarkdown
+                                                    remarkPlugins={[remarkGfm]}
                                                     components={{
                                                         h1: ({ node, ...props }) => <h1 className="text-2xl font-bold text-white mt-8 mb-4 tracking-tight" {...props} />,
                                                         h2: ({ node, ...props }) => <h2 className="text-xl font-bold text-white mt-6 mb-3 tracking-tight" {...props} />,
@@ -305,6 +307,15 @@ const GatituAIDashboard: React.FC = () => {
                                                         strong: ({ node, ...props }) => <strong className="font-semibold text-purple-100 bg-white/5 px-1 rounded" {...props} />,
                                                         a: ({ node, ...props }) => <a className="text-purple-400 hover:text-purple-300 underline underline-offset-4 decoration-purple-500/30 hover:decoration-purple-400 transition-all font-medium" {...props} />,
                                                         blockquote: ({ node, ...props }) => <blockquote className="border-l-2 border-purple-500 pl-4 py-2 my-5 bg-purple-500/5 text-gray-400 rounded-r-xl italic" {...props} />,
+                                                        table: ({ node, ...props }) => (
+                                                            <div className="my-6 w-full overflow-x-auto rounded-xl border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl">
+                                                                <table className="w-full text-left border-collapse" {...props} />
+                                                            </div>
+                                                        ),
+                                                        thead: ({ node, ...props }) => <thead className="bg-white/5 border-b border-white/10" {...props} />,
+                                                        th: ({ node, ...props }) => <th className="px-5 py-3 text-xs font-mono uppercase tracking-wider text-purple-400 font-bold" {...props} />,
+                                                        td: ({ node, ...props }) => <td className="px-5 py-3 text-sm border-t border-white/5 text-gray-300 font-mono" {...props} />,
+                                                        tr: ({ node, ...props }) => <tr className="hover:bg-white/[0.02] transition-colors" {...props} />,
                                                         code({ node, inline, className, children, ...props }: any) {
                                                             const match = /language-(\w+)/.exec(className || '')
                                                             return !inline && match ? (

@@ -16,11 +16,14 @@ async def chat_endpoint(request: Request):
         data = await request.json()
         messages = data.get("messages", [])
         
+        # Filter out empty assistant messages to prevent 'blank' responses from model
+        messages = [m for m in messages if m.get("content") or m.get("role") == "user"]
+        
         async def generate():
             try:
                 chat_completion = client.chat.completions.create(
                     messages=messages,
-                    model="meta-llama/llama-4-scout-17b-16e-instruct",
+                    model="llama-3.3-70b-versatile",
                     stream=True,
                 )
                 
