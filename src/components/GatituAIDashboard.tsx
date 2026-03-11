@@ -227,8 +227,8 @@ const GatituAIDashboard: React.FC = () => {
             <main className="flex-1 relative flex flex-col p-4 sm:p-8 overflow-hidden bg-black pt-16 sm:pt-8">
                 <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 mb-8 space-y-4 sm:space-y-0">
                     <div className="flex items-center space-x-2 bg-white/5 px-4 py-2 rounded-xl border border-white/5 hover:bg-white/10 cursor-pointer transition-all">
-                        <span className="text-xs sm:text-sm font-medium">Llama 3.3 (Groq Direct)</span>
-                        <ArrowUp className="w-4 h-4 rotate-180 text-gray-500" />
+                        <span className="text-xs sm:text-sm font-medium">NEXUS Core 3.3 (Groq)</span>
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] animate-pulse" />
                     </div>
 
                     <div className="flex items-center space-x-3 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
@@ -288,11 +288,33 @@ const GatituAIDashboard: React.FC = () => {
                         ) : (
                             <div className="w-full space-y-8 py-8">
                                 {messages.map((message) => (
-                                    <div key={message.id} className={`flex flex-col ${message.role === 'user' ? 'items-end' : 'items-start'}`}>
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        key={message.id} 
+                                        className={`flex flex-col ${message.role === 'user' ? 'items-end' : 'items-start'}`}
+                                    >
+                                        <div className="flex items-end space-x-3 mb-1 px-2">
+                                            {message.role === 'assistant' && (
+                                                <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
+                                                    <BrainCircuit className="w-3.5 h-3.5 text-purple-400" />
+                                                </div>
+                                            )}
+                                            <span className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">
+                                                {message.role === 'user' ? 'Gatitu User' : 'Nexus Intelligence'}
+                                            </span>
+                                        </div>
+
                                         <div className={clsx(
-                                            "max-w-[80%] rounded-3xl p-5 zyricon-glass border border-white/5",
-                                            message.role === 'user' ? "bg-purple-600/30 text-white shadow-[0_0_20px_rgba(147,51,234,0.15)]" : ""
+                                            "max-w-[85%] rounded-3xl p-6 zyricon-glass border transition-all relative overflow-hidden",
+                                            message.role === 'user' 
+                                                ? "bg-purple-600/20 text-white border-purple-500/30 shadow-[0_0_20px_rgba(147,51,234,0.1)]" 
+                                                : "bg-white/2 border-white/5 shadow-xl"
                                         )}>
+                                            {message.role === 'assistant' && (
+                                                <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-purple-500/40 to-transparent" />
+                                            )}
+                                            
                                             <div className="text-sm font-light leading-relaxed whitespace-normal text-gray-300">
                                                 {!message.content && message.role === 'assistant' ? (
                                                     <div className="flex items-center space-x-3 py-1">
@@ -301,7 +323,7 @@ const GatituAIDashboard: React.FC = () => {
                                                             <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
                                                             <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce" />
                                                         </div>
-                                                        <span className="text-[10px] font-mono text-purple-400/60 uppercase tracking-widest animate-pulse">Initializing Nexus...</span>
+                                                        <span className="text-[10px] font-mono text-purple-400/60 uppercase tracking-widest animate-pulse">Synchronizing...</span>
                                                     </div>
                                                 ) : (
                                                     <ReactMarkdown
@@ -365,7 +387,7 @@ const GatituAIDashboard: React.FC = () => {
                                                 </div>
                                             )}
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 ))}
                                 {isPending && (
                                     <div className="flex flex-col items-start">
