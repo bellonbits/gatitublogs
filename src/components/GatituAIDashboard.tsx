@@ -88,6 +88,9 @@ const GatituAIDashboard: React.FC = () => {
                         if (line.startsWith('data: ')) {
                             try {
                                 const data = JSON.parse(line.slice(6));
+                                if (data.error) {
+                                    throw new Error(data.error);
+                                }
                                 if (data.content) {
                                     fullContent += data.content;
 
