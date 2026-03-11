@@ -227,7 +227,7 @@ const GatituAIDashboard: React.FC = () => {
             <main className="flex-1 relative flex flex-col p-4 sm:p-8 overflow-hidden bg-black pt-16 sm:pt-8">
                 <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 mb-8 space-y-4 sm:space-y-0">
                     <div className="flex items-center space-x-2 bg-white/5 px-4 py-2 rounded-xl border border-white/5 hover:bg-white/10 cursor-pointer transition-all">
-                        <span className="text-xs sm:text-sm font-medium">SCOUT 4.0 (Groq)</span>
+                        <span className="text-xs sm:text-sm font-medium">SCOUT ENGINE (8B Instant)</span>
                         <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)] animate-pulse" />
                     </div>
 

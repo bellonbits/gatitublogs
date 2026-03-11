@@ -25,10 +25,10 @@ async def chat_endpoint(request: Request):
 
         async def generate():
             try:
-                # User specifically requested Meta Scout
+                # Use the ultra-fast Scout-tier model
                 stream = await client.chat.completions.create(
                     messages=messages,
-                    model="meta-llama/llama-4-scout-17b-16e-instruct",
+                    model="llama-3.1-8b-instant",
                     stream=True,
                 )
                 
